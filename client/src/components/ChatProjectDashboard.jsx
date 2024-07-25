@@ -1,17 +1,17 @@
-import React, { useEffect, useState, useRef } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { io } from "socket.io-client";
-import VideoPlayer from "./VideoPlayer";
-import EditorForm from "./EditorForm";
+import React, { useEffect, useState, useRef } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
+import VideoPlayer from './VideoPlayer';
+import EditorForm from './EditorForm';
 
-const socket = io("127.0.0.1:5505");
+const socket = io('127.0.0.1:5505');
 
 const ChatInterface = ({ currReceiver, projectId }) => {
   const [messages, setMessages] = useState([]);
   const [newMessages, setNewMessages] = useState([]);
   const newMessagesRef = useRef(newMessages);
-  const [inputText, setInputText] = useState("");
+  const [inputText, setInputText] = useState('');
   const currUser = useSelector((state) => state.currUser.currUser);
   const isEditor = useSelector((state) => state.currUser.isEditor);
   const currProjectId = useSelector((state) => state.currProject.projectId);
@@ -26,19 +26,19 @@ const ChatInterface = ({ currReceiver, projectId }) => {
   }, [newMessages]);
 
   useEffect(() => {
-    socket.on("addMessage", ({ message, sender }) => {
-      if (message === "") return;
+    socket.on('addMessage', ({ message, sender }) => {
+      if (message === '') return;
       setNewMessages((prevMessages) => [...prevMessages, { sender, message }]);
       setMessages((prevMessages) => [...prevMessages, { sender, message }]);
     });
 
     return () => {
-      socket.off("addMessage");
+      socket.off('addMessage');
     };
   }, [messages]);
 
   const sendMessage = () => {
-    if (inputText.trim() === "") return;
+    if (inputText.trim() === '') return;
     const messageData = {
       message: inputText,
       sender: currUser.name,
@@ -52,8 +52,8 @@ const ChatInterface = ({ currReceiver, projectId }) => {
       messageData.editorUsername = currReceiver;
       messageData.channelUsername = currUser.name;
     }
-    socket.emit("sendMessage", messageData);
-    setInputText("");
+    socket.emit('sendMessage', messageData);
+    setInputText('');
   };
 
   useEffect(() => {
@@ -71,30 +71,27 @@ const ChatInterface = ({ currReceiver, projectId }) => {
   useEffect(() => {
     const fetcher = async () => {
       const resp = await fetch(`http://localhost:5501/chat/fetch`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           projectId: projectId,
         }),
       });
       const res = await resp.json();
-      console.log(res);
       setMessages(res?.data);
     };
     fetcher();
     return () => {
-      console.log("I am going in adder");
       const adder = async () => {
         const filtered = newMessagesRef.current.filter(
           (m) => m.sender === currUser.name
         );
-        console.log("I am in adder", filtered);
         const resp = await fetch(`http://localhost:5501/chat/add`, {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             arr: filtered,
@@ -102,9 +99,8 @@ const ChatInterface = ({ currReceiver, projectId }) => {
           }),
         });
         const res = await resp.json();
-        console.log(res);
         if (res?.ok != true) {
-          alert("Chat Not Saved!!");
+          alert('Chat Not Saved!!');
         }
       };
       adder();
@@ -112,7 +108,7 @@ const ChatInterface = ({ currReceiver, projectId }) => {
   }, []);
 
   return (
-    <div className="flex flex-col " style={{ height: "90vh" }}>
+    <div className="flex flex-col " style={{ height: '90vh' }}>
       <div
         id="chat-history"
         ref={chatHistoryRef}
@@ -120,10 +116,10 @@ const ChatInterface = ({ currReceiver, projectId }) => {
       >
         {messages.map((msg, index) => (
           <div key={index} className="message text-white-400 mr-2">
-            {/* {console.log(msg)} */}
             <span className="sender text-black-400 mr-2 font-bold">
               {msg.sender}
-            </span>: {msg.message}
+            </span>
+            : {msg.message}
           </div>
         ))}
       </div>
@@ -134,7 +130,7 @@ const ChatInterface = ({ currReceiver, projectId }) => {
           onChange={handleInputChange}
           placeholder="Type a message..."
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === 'Enter') {
               sendMessage();
             }
           }}
@@ -152,23 +148,23 @@ const ChatInterface = ({ currReceiver, projectId }) => {
 };
 
 const Form = ({ projectId }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const isEditor = useSelector((state) => state.currUser.isEditor);
 
   const handleUpload = async (e) => {
     e.preventDefault();
     const resp1 = await fetch(
       `http://localhost:5501/video/get?projectId=${projectId}`,
-      { method: "GET" }
+      { method: 'GET' }
     );
     const Videop = await resp1.json();
     const Video = Videop.video;
 
     const resp2 = await fetch(`http://localhost:5501/youtube/upload`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         title,
@@ -181,7 +177,7 @@ const Form = ({ projectId }) => {
     if (data.ok) {
       window.location = data.authUrl;
     } else {
-      alert("Something went wrong");
+      alert('Something went wrong');
     }
   };
   const handleUpload2 = () => {};
@@ -242,7 +238,7 @@ const ChatProjectDashboard = () => {
   const isLogin = useSelector((state) => state.currUser.isLogin);
   const currUser = useSelector((state) => state.currUser.currUser);
   const [currProject, setCurrProject] = useState(null);
-  const [videoLink, setVideoLink] = useState("");
+  const [videoLink, setVideoLink] = useState('');
   const [currReceiver, setCurrReceiver] = useState(null);
   const nav = useNavigate();
 
@@ -251,9 +247,9 @@ const ChatProjectDashboard = () => {
       const res = await fetch(
         `http://localhost:5501/project/getbyId?projectId=${projectId}`,
         {
-          method: "POST",
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             projectId,
@@ -265,7 +261,7 @@ const ChatProjectDashboard = () => {
       setCurrReceiver(
         isEditor ? data?.data?.channelUsername : data?.data?.editorUsername
       );
-      socket.emit("join", {
+      socket.emit('join', {
         channelUsername: data?.data?.channelUsername,
         editorUsername: data?.data?.editorUsername,
         projectId,
@@ -277,22 +273,22 @@ const ChatProjectDashboard = () => {
 
   useEffect(() => {
     if (!isLogin) {
-      nav("/login");
+      nav('/login');
     }
   }, [isLogin, nav]);
 
   useEffect(() => {
-    socket.on("joinAlso", ({ channelUsername, editorUsername, roomId }) => {
+    socket.on('joinAlso', ({ channelUsername, editorUsername, roomId }) => {
       if (
         channelUsername === currUser?.name ||
         editorUsername === currUser?.name
       ) {
-        socket.emit("finalJoin", { channelUsername, editorUsername, roomId });
+        socket.emit('finalJoin', { channelUsername, editorUsername, roomId });
       }
     });
 
     return () => {
-      socket.off("joinAlso");
+      socket.off('joinAlso');
     };
   }, [currUser]);
 
@@ -300,15 +296,15 @@ const ChatProjectDashboard = () => {
     const fetchVideoLink = async () => {
       const resp1 = await fetch(
         `http://localhost:5501/video/get?projectId=${projectId}`,
-        { method: "GET" }
+        { method: 'GET' }
       );
       const Videop = await resp1.json();
       const Video = Videop.video;
 
       const resp2 = await fetch(`http://localhost:5501/stream/streaming`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ ...Video }),
       });
@@ -325,19 +321,19 @@ const ChatProjectDashboard = () => {
     sources: [
       {
         src: videoLink,
-        type: "application/x-mpegURL",
+        type: 'application/x-mpegURL',
       },
     ],
   };
 
   const handlePlayerReady = (player) => {
     // You can handle player events here, for example:
-    player.on("waiting", () => {
-      videojs.log("player is waiting");
+    player.on('waiting', () => {
+      videojs.log('player is waiting');
     });
 
-    player.on("dispose", () => {
-      videojs.log("player will dispose");
+    player.on('dispose', () => {
+      videojs.log('player will dispose');
     });
   };
 

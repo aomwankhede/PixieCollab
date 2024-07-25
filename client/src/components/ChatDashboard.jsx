@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { io } from "socket.io-client";
-import VideoPlayer from "./VideoPlayer";
-import { useRef } from "react";
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { io } from 'socket.io-client';
+import VideoPlayer from './VideoPlayer';
+import { useRef } from 'react';
 
-const socket = io("127.0.0.1:5505");
+const socket = io('127.0.0.1:5505');
 
 const ChatInterface = ({ currReceiver, projectId }) => {
   const [messages, setMessages] = useState([]);
-  const [inputText, setInputText] = useState("");
+  const [inputText, setInputText] = useState('');
   const currUser = useSelector((state) => state.currUser.currUser);
   const isEditor = useSelector((state) => state.currUser.isEditor);
   const chatHistoryRef = React.useRef(null);
@@ -18,16 +18,15 @@ const ChatInterface = ({ currReceiver, projectId }) => {
     setInputText(e.target.value);
   };
 
-  socket.on("addMessage", ({ message, sender }) => {
-    if (message === "") return;
-    console.log("You typed ,", message);
+  socket.on('addMessage', ({ message, sender }) => {
+    if (message === '') return;
     setMessages([...messages, { sender: sender, message: message }]);
   });
 
   const sendMessage = () => {
-    if (inputText.trim() === "") return;
+    if (inputText.trim() === '') return;
     if (isEditor) {
-      socket.emit("sendMessage", {
+      socket.emit('sendMessage', {
         editorUsername: currUser.name,
         channelUsername: currReceiver.name,
         message: inputText,
@@ -35,7 +34,7 @@ const ChatInterface = ({ currReceiver, projectId }) => {
         roomId: projectId,
       });
     } else {
-      socket.emit("sendMessage", {
+      socket.emit('sendMessage', {
         editorUsername: currReceiver.name,
         channelUsername: currUser.name,
         message: inputText,
@@ -43,7 +42,7 @@ const ChatInterface = ({ currReceiver, projectId }) => {
         roomId: projectId,
       });
     }
-    setInputText("");
+    setInputText('');
   };
 
   useEffect(() => {
@@ -61,16 +60,16 @@ const ChatInterface = ({ currReceiver, projectId }) => {
         ref={chatHistoryRef}
         className="h-4/5 overflow-y-scroll mb-4 p-4 flex-col flex justify-between"
         style={{
-          border: "1px solid #ddd",
-          borderRadius: "8px",
-          padding: "10px",
+          border: '1px solid #ddd',
+          borderRadius: '8px',
+          padding: '10px',
         }}
       >
         {messages.map((msg, index) => (
           <div key={index} className="message">
             <span
               className="sender"
-              style={{ color: "#aaa", marginRight: "5px" }}
+              style={{ color: '#aaa', marginRight: '5px' }}
             >
               {msg.sender}
             </span>
@@ -85,19 +84,19 @@ const ChatInterface = ({ currReceiver, projectId }) => {
           onChange={handleInputChange}
           placeholder="Type a message..."
           onKeyDown={(e) => {
-            if (e.key === "Enter") {
+            if (e.key === 'Enter') {
               sendMessage();
             }
           }}
           className="flex-grow px-2 py-1 rounded-l border border-gray-300"
-          style={{ borderTopLeftRadius: "8px", borderBottomLeftRadius: "8px" }}
+          style={{ borderTopLeftRadius: '8px', borderBottomLeftRadius: '8px' }}
         />
         <button
           onClick={sendMessage}
           className="px-4 py-1 bg-blue-500 text-white rounded-r"
           style={{
-            borderTopRightRadius: "8px",
-            borderBottomRightRadius: "8px",
+            borderTopRightRadius: '8px',
+            borderBottomRightRadius: '8px',
           }}
         >
           Send
@@ -118,10 +117,10 @@ const Friend = ({ friend, setCurrReceiver, setProjectId }) => {
         setProjectId(projectId);
         if (isEditor) {
           setCurrReceiver(channelUsername);
-          socket.emit("join", { ...friend, roomId: projectId });
+          socket.emit('join', { ...friend, roomId: projectId });
         } else {
           setCurrReceiver(editorUsername);
-          socket.emit("join", { ...friend, roomId: projectId });
+          socket.emit('join', { ...friend, roomId: projectId });
         }
       }}
     >
@@ -137,22 +136,22 @@ const Friend = ({ friend, setCurrReceiver, setProjectId }) => {
   );
 };
 const Form = ({ projectId }) => {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
 
   const handleUpload = async (e) => {
     e.preventDefault();
     const resp1 = await fetch(
       `http://localhost:5501/video/get?projectId=${projectId}`,
-      { method: "GET" }
+      { method: 'GET' }
     );
     const Videop = await resp1.json();
     const Video = Videop.video;
 
     const resp2 = await fetch(`http://localhost:5501/youtube/upload`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         title: title,
@@ -165,14 +164,20 @@ const Form = ({ projectId }) => {
     if (data.ok) {
       window.location = data.authUrl;
     } else {
-      alert("Something went wrong");
+      alert('Something went wrong');
     }
-  }
+  };
 
   return (
-    <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 max-w-md mx-auto" onSubmit={handleUpload}>
+    <form
+      className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 max-w-md mx-auto"
+      onSubmit={handleUpload}
+    >
       <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
+        <label
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="title"
+        >
           Title
         </label>
         <input
@@ -185,7 +190,10 @@ const Form = ({ projectId }) => {
         />
       </div>
       <div className="mb-6">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+        <label
+          className="block text-gray-700 text-sm font-bold mb-2"
+          htmlFor="description"
+        >
           Description
         </label>
         <input
@@ -207,50 +215,49 @@ const Form = ({ projectId }) => {
       </div>
     </form>
   );
-}
+};
 
 const ChatDashboard = () => {
   const isLogin = useSelector((state) => state.currUser.isLogin);
   const isEditor = useSelector((state) => state.currUser.isEditor);
   const currUser = useSelector((state) => state.currUser.currUser);
-  const [videoLink, setVideoLink] = useState("");
+  const [videoLink, setVideoLink] = useState('');
   const [currReceiver, setCurrReceiver] = useState(null);
   const [friends, setFriends] = useState([]);
-  const [inputText, setInputText] = useState("");
-  const [projectId, setProjectId] = useState("");
+  const [inputText, setInputText] = useState('');
+  const [projectId, setProjectId] = useState('');
   const handleInputChange = (event) => {
     setInputText(event.target.value);
   };
   const sendMessage = () => {
-    if (inputText.trim() === "") return;
-    setMessages([...messages, { sender: "You", message: inputText }]);
-    setInputText("");
+    if (inputText.trim() === '') return;
+    setMessages([...messages, { sender: 'You', message: inputText }]);
+    setInputText('');
     // Call your backend or processing logic here
   };
 
   const nav = useNavigate();
   useEffect(() => {
     if (!isLogin) {
-      nav("/login");
+      nav('/login');
     }
   });
 
-  socket.on("joinAlso", ({ channelUsername, editorUsername, roomId }) => {
+  socket.on('joinAlso', ({ channelUsername, editorUsername, roomId }) => {
     if (
       channelUsername === currUser?.name ||
       editorUsername === currUser?.name
     ) {
-      console.log("finalJoin Called");
-      socket.emit("finalJoin", { channelUsername, editorUsername, roomId });
+      socket.emit('finalJoin', { channelUsername, editorUsername, roomId });
     }
   });
 
   useEffect(() => {
     const func = async () => {
-      const res = await fetch("http://localhost:5501/project/get", {
-        method: "POST",
+      const res = await fetch('http://localhost:5501/project/get', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(
           isEditor
@@ -259,7 +266,6 @@ const ChatDashboard = () => {
         ),
       });
       const data = await res.json();
-      console.log(data.data);
       setFriends(data.data);
     };
     func();
@@ -272,20 +278,18 @@ const ChatDashboard = () => {
     const func = async () => {
       const resp1 = await fetch(
         `http://localhost:5501/video/get?projectId=${projectId}`,
-        { method: "GET" }
+        { method: 'GET' }
       );
       const Videop = await resp1.json();
       const Video = Videop.video;
-      console.log(Video);
       const resp2 = await fetch(`http://localhost:5501/stream/streaming`, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ ...Video }),
       });
       const streamResp = await resp2.json();
-      console.log(streamResp);
       setVideoLink(streamResp.videoUrl);
     };
     func();
@@ -298,7 +302,7 @@ const ChatDashboard = () => {
     sources: [
       {
         src: videoLink,
-        type: "application/x-mpegURL",
+        type: 'application/x-mpegURL',
       },
     ],
   };
@@ -307,12 +311,12 @@ const ChatDashboard = () => {
     playerRef.current = player;
 
     // You can handle player events here, for example:
-    player.on("waiting", () => {
-      videojs.log("player is waiting");
+    player.on('waiting', () => {
+      videojs.log('player is waiting');
     });
 
-    player.on("dispose", () => {
-      videojs.log("player will dispose");
+    player.on('dispose', () => {
+      videojs.log('player will dispose');
     });
   };
 
@@ -342,9 +346,7 @@ const ChatDashboard = () => {
       <div className="w-1/3 h-full" id="videojs">
         <div className="p-2">Chatting with: {currReceiver}</div>
         <VideoPlayer options={videoPlayerOptions} onReady={handlePlayerReady} />
-        {!isEditor?(
-          <Form projectId={projectId}/>
-        ):<div></div>}
+        {!isEditor ? <Form projectId={projectId} /> : <div></div>}
       </div>
     </div>
   );

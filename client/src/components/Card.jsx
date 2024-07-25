@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Card,
   CardBody,
@@ -6,14 +6,14 @@ import {
   Typography,
   Avatar,
   Tooltip,
-} from "@material-tailwind/react";
-import { RiDeleteBin6Line } from "react-icons/ri"; // Import delete icon from React Icons
-import axios from "axios"; // Import axios for HTTP requests
-import {useNavigate} from "react-router-dom";
-import {useDispatch} from "react-redux";
-import { useSelector } from "react-redux";
-import {setProjectId} from "../features/projectSlice";
-import store from "../app/store";
+} from '@material-tailwind/react';
+import { RiDeleteBin6Line } from 'react-icons/ri'; // Import delete icon from React Icons
+import axios from 'axios'; // Import axios for HTTP requests
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { setProjectId } from '../features/projectSlice';
+import store from '../app/store';
 export function BlogCard({
   projectName,
   projectDescription,
@@ -25,7 +25,6 @@ export function BlogCard({
   onDelete, // Add onDelete prop for handling delete action
 }) {
   const [isHovered, setIsHovered] = useState(false);
-  console.log(useSelector((state)=>state))
   const handleMouseEnter = () => {
     setIsHovered(true);
   };
@@ -35,8 +34,8 @@ export function BlogCard({
   };
 
   const cardStyle = {
-    transition: "transform 0.3s ease",
-    transform: isHovered ? "scale(1.05)" : "scale(1)",
+    transition: 'transform 0.3s ease',
+    transform: isHovered ? 'scale(1.05)' : 'scale(1)',
   };
 
   let name;
@@ -49,14 +48,14 @@ export function BlogCard({
   const handleDelete = async () => {
     try {
       // Send delete request to backend API
-      await axios.delete("http://localhost:5501/project/delete", {
+      await axios.delete('http://localhost:5501/project/delete', {
         data: { projectId }, // Pass projectId in the request body
       });
       fun(state.filter((project) => project.projectId != projectId));
       // Call onDelete callback to remove the card from UI
       // onDelete(projectId);
     } catch (error) {
-      console.error("Error deleting project:", error);
+      console.error('Error deleting project:', error);
     }
   };
 
@@ -64,7 +63,7 @@ export function BlogCard({
   const dispatch = useDispatch();
   const handleCardClick = () => {
     dispatch(setProjectId(projectId));
-    nav("/chat");
+    nav('/chat');
   };
   return (
     <Card
@@ -74,7 +73,7 @@ export function BlogCard({
       onMouseLeave={handleMouseLeave}
       onClick={handleCardClick}
     >
-      <CardBody className={`p-4 flex-1 ${!isComplete ? "bg-yellow-50" : ""}`}>
+      <CardBody className={`p-4 flex-1 ${!isComplete ? 'bg-yellow-50' : ''}`}>
         <Typography variant="h5" color="blue-gray">
           {projectName}
         </Typography>
@@ -84,7 +83,7 @@ export function BlogCard({
       </CardBody>
       <CardFooter
         className={`flex items-center justify-between p-4 ${
-          !isComplete ? "bg-yellow-50" : ""
+          !isComplete ? 'bg-yellow-50' : ''
         }`}
       >
         <div className="flex items-center -space-x-2">

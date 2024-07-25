@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
-import { Button } from "@material-tailwind/react";
-import axios from "axios";
-import { BlogCard } from "./Card";
+import React, { useState, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
+import { Button } from '@material-tailwind/react';
+import axios from 'axios';
+import { BlogCard } from './Card';
 
 const EditorHomePage = () => {
   const currUser = useSelector((state) => state.currUser?.currUser);
@@ -13,7 +13,7 @@ const EditorHomePage = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   // State to manage form input
   const [formData, setFormData] = useState({
-    projectId: "",
+    projectId: '',
   });
 
   // Reference to the form container
@@ -22,14 +22,14 @@ const EditorHomePage = () => {
   useEffect(() => {
     // Fetch data when component mounts
     axios
-      .post("http://localhost:5501/project/get", {
+      .post('http://localhost:5501/project/get', {
         editor: currUser?.name,
       })
       .then((response) => {
         setProjects(response.data.data);
       })
       .catch((error) => {
-        console.error("Error fetching projects:", error);
+        console.error('Error fetching projects:', error);
       });
   }, [currUser?.name]); // Trigger the effect when currUser?.name changes
 
@@ -58,29 +58,29 @@ const EditorHomePage = () => {
   const handleJoinProject = (projectId) => {
     const editorUsername = currUser?.name;
     axios
-      .post("http://localhost:5501/project/join", {
+      .post('http://localhost:5501/project/join', {
         projectId,
       })
       .then((response) => {
         // Fetch updated list of projects after join
         axios
-          .post("http://localhost:5501/project/get", {
+          .post('http://localhost:5501/project/get', {
             editor: currUser?.name,
           })
           .then((response) => {
             setProjects(response.data.data); // Update projects state with new data
           })
           .catch((error) => {
-            console.error("Error fetching projects after join:", error);
+            console.error('Error fetching projects after join:', error);
           });
-  
+
         setIsFormVisible(false); // Hide the form after joining
       })
       .catch((error) => {
-        console.error("Error joining project:", error);
+        console.error('Error joining project:', error);
       });
   };
-  
+
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -98,13 +98,13 @@ const EditorHomePage = () => {
 
   useEffect(() => {
     if (isFormVisible) {
-      document.addEventListener("mousedown", handleOutsideClick);
+      document.addEventListener('mousedown', handleOutsideClick);
     } else {
-      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener('mousedown', handleOutsideClick);
     }
 
     return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener('mousedown', handleOutsideClick);
     };
   }, [isFormVisible]);
 
@@ -123,7 +123,7 @@ const EditorHomePage = () => {
       </div>
 
       <div className="grid grid-cols-4 gap-4 p-7">
-        {/* {projects
+        {projects
           .filter((project) => project.isComplete)
           .map((project) => (
             <div key={project._id} className="mb-2">
@@ -133,26 +133,11 @@ const EditorHomePage = () => {
                 channelUsername={project.channelUsername}
                 isComplete={tp}
                 projectId={project.projectId}
+                fun={setProjects}
+                state={projects}
               />
             </div>
-          ))} */}
-          {console.log(projects)}
-          {projects
-  .filter((project) => project.isComplete)
-  .map((project) => (
-    <div key={project._id} className="mb-2">
-      <BlogCard
-        projectName={project.projectName}
-        projectDescription={project.projectDescription}
-        channelUsername={project.channelUsername}
-        isComplete={tp}
-        projectId={project.projectId}
-        fun={setProjects}
-        state={projects}
-      />
-    </div>
-  ))}
-
+          ))}
       </div>
       {/* Join New Project Button */}
       <div className="flex items-center justify-center py-7 bg-gray-100">
@@ -168,7 +153,7 @@ const EditorHomePage = () => {
             className="flex items-center gap-2"
             onClick={() => setIsFormVisible(true)}
           >
-            Join New Project{" "}
+            Join New Project{' '}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -192,7 +177,7 @@ const EditorHomePage = () => {
         <div
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
           style={{
-            transition: "opacity 0.3s ease-in-out",
+            transition: 'opacity 0.3s ease-in-out',
             opacity: 1,
           }}
         >
@@ -200,8 +185,8 @@ const EditorHomePage = () => {
             ref={formRef}
             className="bg-white p-8 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out"
             style={{
-              animation: "slideIn 0.3s ease-in-out",
-              maxWidth: "80vw",
+              animation: 'slideIn 0.3s ease-in-out',
+              maxWidth: '80vw',
             }}
           >
             <h2 className="text-2xl font-bold mb-4">Join a Project</h2>
