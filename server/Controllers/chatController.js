@@ -2,13 +2,12 @@ const Chat = require('../Models/ChatModel');
 const add = async (req, res) => {
   try {
     const { arr, projectId } = req.body;
-    console.log('Hamas', arr, projectId);
     for (let i = 0; i < arr.length; i++) {
       const { message, sender } = arr[i];
       const chat = new Chat({
         projectId: projectId,
         message,
-        sender
+        sender,
       });
       await chat.save();
     }

@@ -7,10 +7,8 @@ const axios = require('axios');
 
 const router = express.Router();
 
-
 router.post('/upload', async (req, res) => {
   const { title, description, cloudinaryUrl } = req.body;
-  console.log(title,description,cloudinaryUrl)
   if (!title || !description || !cloudinaryUrl) {
     return res.status(400).send('Missing required fields');
   }
@@ -19,12 +17,14 @@ router.post('/upload', async (req, res) => {
 
   try {
     await downloadVideoFromCloudinary(cloudinaryUrl, filename);
-    
+
     const authUrl = generateAuthUrl(filename, title, description);
-    res.status(200).json({ ok:true,authUrl }); // Send authUrl back to client
+    res.status(200).json({ ok: true, authUrl }); // Send authUrl back to client
   } catch (error) {
     console.error('Error downloading video from Cloudinary:', error);
-    res.status(500).json({ok:false,error:'Error downloading video from Cloudinary'});
+    res
+      .status(500)
+      .json({ ok: false, error: 'Error downloading video from Cloudinary' });
   }
 });
 
@@ -39,15 +39,14 @@ router.get('/oauth2callback', (req, res) => {
   const { filename, title, description } = JSON.parse(req.query.state);
 
   exchangeCodeForTokens(code)
-    .then(tokens => {
+    .then((tokens) => {
       return uploadVideoToYouTube(filename, title, description, tokens);
     })
     .then(() => {
       console.log('Video uploaded successfully');
       res.redirect('http://localhost:5173/chat');
-      // alert('Video uploaded successfully')
     })
-    .catch(error => {
+    .catch((error) => {
       console.error('Error uploading video to YouTube:', error);
       res.redirect('http://localhost:5173/chat');
       // alert('Video uploaded successfully')
@@ -103,22 +102,25 @@ function uploadVideoToYouTube(filename, title, description, tokens) {
   oAuth.setCredentials(tokens);
 
   return new Promise((resolve, reject) => {
-    youtube.videos.insert({
-      resource: {
-        snippet: { title, description },
-        status: { privacyStatus: 'private' },
+    youtube.videos.insert(
+      {
+        resource: {
+          snippet: { title, description },
+          status: { privacyStatus: 'private' },
+        },
+        part: 'snippet,status',
+        media: {
+          body: fs.createReadStream(filename),
+        },
       },
-      part: 'snippet,status',
-      media: {
-        body: fs.createReadStream(filename),
-      },
-    }, (err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(data);
+      (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
       }
-    });
+    );
   });
 }
 
@@ -133,4 +135,3 @@ async function downloadVideoFromCloudinary(cloudinaryUrl, filename) {
 }
 
 module.exports = router;
-

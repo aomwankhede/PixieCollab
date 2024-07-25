@@ -6,15 +6,14 @@ const { pipeline } = require('stream');
 const { exec } = require('child_process');
 
 const uploadToCloudinary = async (req, resp) => {
-  console.log('Hi Hello');
   try {
     cloudinary.config({
       cloud_name: process.env.cloud_name,
       api_key: process.env.api_key,
-      api_secret: process.env.api_secret
+      api_secret: process.env.api_secret,
     });
     const { name, description, projectId } = req.body;
-    console.log('started');
+    console.log('Started...');
     const uploadResult = await new Promise((resolve, reject) => {
       cloudinary.uploader.upload_large(
         req.file.path,
@@ -28,37 +27,34 @@ const uploadToCloudinary = async (req, resp) => {
         }
       );
     });
-    const respo = await fetch(`http://localhost:5501/video/get?projectId=${projectId}`,{
-      method:"GET",
-      headers:{
-        "Content-Type":"application/json"
+    console.log('uploadResult', uploadResult);
+    const respo = await fetch(
+      `http://localhost:5501/video/get?projectId=${projectId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       }
-    });
+    );
     const pastVide = await respo.json();
     const pastVideo = pastVide.video;
-    if(pastVideo){
-      console.log("PastVideo:-");
-      console.log(pastVideo);
-    
-      // Assuming `pastVideo` has an `_id` field or some other unique identifier
+    if (pastVideo) {
       const filter = { _id: pastVideo._id };
       const update = { url: uploadResult.secure_url };
-    
+
       await Video.updateOne(filter, update);
-    }
-    else{
+    } else {
       const newVideo = new Video({
         name: name,
         description: description,
         projectId: projectId,
-        url: uploadResult.secure_url
+        url: uploadResult.secure_url,
       });
       await newVideo.save();
     }
-    console.log('Video Uploaded : ', uploadResult.secure_url);
     resp.json({ data: 'Uploaded Successfully!!' });
   } catch (error) {
-    // console.log("Hwllorgkjb");
     console.error(error);
     resp.status(500).json({ error: error.message });
   }
@@ -67,7 +63,6 @@ const uploadToCloudinary = async (req, resp) => {
 const streamFromCloudinary = async (req, resp) => {
   const { url, name } = req.body;
 
-  console.log('url:-', url, 'name:-', name);
   try {
     const videoPath = url;
     const outputPath = `./public/uploads/${name}`;
@@ -90,7 +85,7 @@ const streamFromCloudinary = async (req, resp) => {
 
       resp.json({
         message: 'Video converted to HLS format',
-        videoUrl: videoUrl
+        videoUrl: videoUrl,
       });
     });
   } catch (error) {

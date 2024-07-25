@@ -5,9 +5,9 @@ const catchAsync = require('../utils/catchAsync');
 const Channel = require('../Models/ChannelModel');
 const AppError = require('../utils/appError');
 
-const signToken = id => {
+const signToken = (id) => {
   return jwt.sign({ id: id, isEditor: false }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN
+    expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
@@ -17,7 +17,7 @@ const createSendToken = (channel, statusCode, res) => {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
-    httpOnly: true
+    httpOnly: true,
   };
   if (process.env.NODE_ENV === 'production') cookieOptions.secure = true;
   res.cookie('jwt', token, cookieOptions);
@@ -26,13 +26,13 @@ const createSendToken = (channel, statusCode, res) => {
     token,
     data: {
       channel,
-      isEditor: false
-    }
+      isEditor: false,
+    },
   });
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
-  console.log(req.body)
+  console.log(req.body);
   const newChannel = await Channel.create({
     channelUserName: req.body.channelUserName,
     channelPasswd: req.body.channelPasswd,
@@ -40,21 +40,20 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
-    type: req.body.type
+    type: req.body.type,
   });
   createSendToken(newChannel, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-  console.log("Cookies:-",req)
   //1) Check if Both email and password is provided
   if (!email || !password) {
     return next(new AppError('Please Provide both email and password', 400));
   }
   //2)check if user exists and password is correct
   const channel = await Channel.findOne({
-    email: email
+    email: email,
   }).select('+password'); //password is hidden that's why explicitly mentioned to show it
 
   if (

@@ -3,31 +3,11 @@ const Project = require('../Models/Project');
 const secretFunction = async (editor, channel) => {
   let projectId = editor + channel;
   const projectArray = await Project.find({
-    $and: [{ editorUsername: editor, channelUsername: channel }]
+    $and: [{ editorUsername: editor, channelUsername: channel }],
   });
-  console.log(projectArray, 'projectArray');
   projectId += projectArray.length;
   return projectId;
 };
-
-// const addProject = async (req, res) => {
-//   try {
-//     const { editor, channel, projectName, projectDescription } = req.body;
-//     const projectId = await secretFunction(editor, channel);
-//     const project = new Project({
-//       editorUsername: editor,
-//       channelUsername: channel,
-//       projectName,
-//       projectDescription,
-//       projectId
-//     });
-//     await project.save();
-//     res.status(200).json({ data: project, ok: true });
-//   } catch (err) {
-//     console.log(err);
-//     res.status(400).json({ data: 'Failed to Load', ok: false });
-//   }
-// };
 
 const addProject = async (req, res) => {
   try {
@@ -42,7 +22,7 @@ const addProject = async (req, res) => {
       projectDescription,
       projectId,
       editorUsername: editor,
-      channelUsername: channel
+      channelUsername: channel,
     });
 
     // Save project to database
@@ -86,14 +66,10 @@ const joinProject = async (req, res) => {
 };
 
 const getProjects = async (req, res) => {
-  // console.log("mmmm",req.body,"mmm");
   const { editor, channel } = req.body;
-  // console.log("nandn",editor, channel);
   try {
     if (editor) {
-      console.log("Eddie ",editor)
       const projects = await Project.find({ editorUsername: editor });
-      console.log("Eddie ",projects)
       res.status(200).json({ data: projects, ok: true });
     } else {
       const projects = await Project.find({ channelUsername: channel });
@@ -131,5 +107,5 @@ module.exports = {
   getProjects,
   deleteProject,
   joinProject,
-  getByIdProject
+  getByIdProject,
 };
